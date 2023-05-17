@@ -7,11 +7,15 @@ import com.example.common.ResponMessge;
 import com.example.mapper.UserMapper;
 import com.example.model.entity.User;
 import com.example.model.request.UserRequestFindPassword;
+import com.example.model.request.UserRequestLogin;
 import com.example.model.request.UserRequestRegister;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Autowired
@@ -43,6 +47,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }else {
             return BaseResponse.Error(ResponMessge.CaptchaError.getMessage());
         }
+    }
+
+    @Override
+    public BaseResponse login(UserRequestLogin userRequestLogin) {
+        if (userRequestLogin.getPassword().equals(userMapper.selectById(userRequestLogin.getUserId()).getPassword())) {
+
+            String token= UUID.randomUUID().toString();
+
+            template.opsForValue().set(token,userRequestLogin.getUserId());
+            return BaseResponse.success(userMapper.selectById(userRequestLogin.getUserId()));
+        }
+        return BaseResponse.Error(ResponMessge.UserOrPasswordError.getMessage());
     }
 }
 
