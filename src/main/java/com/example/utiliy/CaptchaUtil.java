@@ -14,7 +14,7 @@ public class CaptchaUtil {
     StringRedisTemplate template;//连接redis，并注册为bean
     public static String getCode() {
        Random random= new Random();
-        int randomCode =random.nextInt(100000,999999);
+        int randomCode=100000+random.nextInt(899999);
         String s1 = randomCode+"";//将int转换成字符串
         return s1;
     }

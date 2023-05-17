@@ -8,9 +8,14 @@ import com.example.model.request.UserRequestLogin;
 import com.example.model.request.UserRequestRegister;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface UserService extends IService<User> {
     BaseResponse register(@RequestBody UserRequestRegister userRequestRegister);
     BaseResponse findPassword(@RequestBody UserRequestFindPassword userRequestFindPassword);
     BaseResponse login(@RequestBody UserRequestLogin userRequestLogin);
+    BaseResponse showMyMessage(HttpServletRequest httpServletRequest);
+
+    BaseResponse logout(HttpServletRequest httpServletRequest);
 
 }
