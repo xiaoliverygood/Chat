@@ -6,6 +6,7 @@ import com.example.common.BaseResponse;
 import com.example.common.ResponMessge;
 import com.example.mapper.UserMapper;
 import com.example.model.entity.User;
+import com.example.model.request.UserRequestFindPassword;
 import com.example.model.request.UserRequestRegister;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return BaseResponse.Error(ResponMessge.CaptchaError.getMessage());
         }
 
+    }
+
+    @Override
+    public BaseResponse findPassword(UserRequestFindPassword userRequestFindPassword) {
+        if(userRequestFindPassword.getCode()
+                .equals(template.opsForValue().get(userRequestFindPassword.getUserId()+"FindPassword"))){
+            User user=userMapper.selectById(userRequestFindPassword.getUserId());
+            user.setPassword(userRequestFindPassword.getNewPassword());
+            userMapper.updateById(user);
+            return BaseResponse.success(user);
+        }else {
+            return BaseResponse.Error(ResponMessge.CaptchaError.getMessage());
+        }
     }
 }
 

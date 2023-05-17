@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.common.BaseResponse;
 import com.example.model.entity.User;
+import com.example.model.request.UserRequestFindPassword;
 import com.example.model.request.UserRequestRegister;
 import com.example.service.UserService;
 import com.example.utiliy.CaptchaUtil;
@@ -16,6 +17,10 @@ public class UserController {
     @PostMapping("register")
     public BaseResponse register(@RequestBody UserRequestRegister userRequestRegister){
         return userService.register(userRequestRegister);
+    }
+    @PostMapping("/findPassword")
+    public BaseResponse findPassword(@RequestBody UserRequestFindPassword userRequestFindPassword){
+        return userService.findPassword(userRequestFindPassword);
     }
 
 }
