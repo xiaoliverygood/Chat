@@ -32,14 +32,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return BaseResponse.Error(ResponMessge.EmailError);
         if (userRequestRegister.getCode()
                 .equals(template.opsForValue().get(userRequestRegister.getUserId() + "Register"))) {
-            User user = new User(userRequestRegister.getUserId(), userRequestRegister.getUserName(), userRequestRegister.getPassword(), null, null, null, "User");
+            User user = new User(userRequestRegister.getUserId(), userRequestRegister.getUserName(), userRequestRegister.getPassword(), null, null, null, userRequestRegister.getRole());
             userMapper.insert(user);
             template.delete(userRequestRegister.getUserId() + "Register");
             return BaseResponse.success(user);
         } else {
             return BaseResponse.Error(ResponMessge.CaptchaError.getMessage());
         }
-
     }
 
     @Override

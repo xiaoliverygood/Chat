@@ -17,6 +17,14 @@ public class LoginInterceptor implements HandlerInterceptor {
         if(judgmentToken.Judgment(request)){
             return true;
         }
+        if(request.getHeader("token")==null){
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":401,\"message\":\"用户未登录\"}");
+        }
+        if(request.getHeader("token")!=null){
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"code\":401,\"message\":\"用户token已经过期\"}");
+        }
         return false;
     }
 }
