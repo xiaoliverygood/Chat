@@ -30,6 +30,10 @@ public class UserController {
     public BaseResponse showMyMessage(HttpServletRequest httpServletRequest){
         return userService.showMyMessage(httpServletRequest);
     }
+    @PostMapping("/addFriend")
+    public BaseResponse addFriend(HttpServletRequest httpServletRequest,String friendId){
+       return userService.addFriend(httpServletRequest,friendId);
+    }
 
     @PostMapping("/logout")
     public BaseResponse logout(HttpServletRequest httpServletRequest){

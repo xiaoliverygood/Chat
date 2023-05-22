@@ -4,12 +4,14 @@ package com.example.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.common.BaseResponse;
 import com.example.common.ResponMessge;
+import com.example.mapper.UserFriendMapper;
 import com.example.mapper.UserMapper;
 import com.example.model.entity.User;
 import com.example.model.request.UserRequestFindPassword;
 import com.example.model.request.UserRequestLogin;
 import com.example.model.request.UserRequestRegister;
 import com.example.model.respond.UserRespondLogin;
+import com.example.service.UserFriendService;
 import com.example.service.UserService;
 import com.example.utiliy.EmailRegularExpression;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +27,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     StringRedisTemplate template;//连接redis，并注册为bean
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    UserFriendService userFriendService;
 
     @Override
     public BaseResponse register(UserRequestRegister userRequestRegister) {
-        if (!EmailRegularExpression.RegularEmailPattern(userRequestRegister.getUserId()))
+        if (!EmailRegularExpression.RegularEmailPattern(userRequestRegister.getUserId())) {
             return BaseResponse.Error(ResponMessge.EmailError);
+        }
         if (userRequestRegister.getCode()
                 .equals(template.opsForValue().get(userRequestRegister.getUserId() + "Register"))) {
             User user = new User(userRequestRegister.getUserId(), userRequestRegister.getUserName(), userRequestRegister.getPassword(), null, null, null, userRequestRegister.getRole());
@@ -43,8 +48,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse findPassword(UserRequestFindPassword userRequestFindPassword) {
-        if (!EmailRegularExpression.RegularEmailPattern(userRequestFindPassword.getUserId()))
+        if (!EmailRegularExpression.RegularEmailPattern(userRequestFindPassword.getUserId())) {
             return BaseResponse.Error(ResponMessge.EmailError);
+        }
 
         if (userRequestFindPassword.getCode()
                 .equals(template.opsForValue().get(userRequestFindPassword.getUserId() + "FindPassword"))) {
@@ -60,8 +66,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public BaseResponse login(UserRequestLogin userRequestLogin) {
-        if (!EmailRegularExpression.RegularEmailPattern(userRequestLogin.getUserId()))
+        if (!EmailRegularExpression.RegularEmailPattern(userRequestLogin.getUserId())) {
             return BaseResponse.Error(ResponMessge.EmailError);
+        }
 
         if (userRequestLogin.getPassword().equals(userMapper.selectById(userRequestLogin.getUserId()).getPassword())) {
 
@@ -87,6 +94,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public BaseResponse logout(HttpServletRequest httpServletRequest) {
         template.delete(httpServletRequest.getHeader("token"));
         return BaseResponse.success(ResponMessge.Logoutsuccess.getMessage());
+    }
+
+    @Override
+    public BaseResponse addFriend(HttpServletRequest httpServletRequest, String friendId) {
+        return BaseResponse.success(userFriendService.addFriend(template.opsForValue().get(httpServletRequest.getHeader("token")),friendId));
     }
 }
 

@@ -17,5 +17,6 @@ public interface UserService extends IService<User> {
     BaseResponse showMyMessage(HttpServletRequest httpServletRequest);
 
     BaseResponse logout(HttpServletRequest httpServletRequest);
+    BaseResponse addFriend(HttpServletRequest httpServletRequest,String friendId);
 
 }
