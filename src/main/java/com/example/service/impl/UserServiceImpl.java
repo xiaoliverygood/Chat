@@ -35,8 +35,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!EmailRegularExpression.RegularEmailPattern(userRequestRegister.getUserId())) {
             return BaseResponse.Error(ResponMessge.EmailError);
         }
-        if (userRequestRegister.getCode()
-                .equals(template.opsForValue().get(userRequestRegister.getUserId() + "Register"))) {
+       // userRequestRegister.getCode()
+              //  .equals(template.opsForValue().get(userRequestRegister.getUserId() + "Register"))
+        if (true) {
             User user = new User(userRequestRegister.getUserId(), userRequestRegister.getUserName(), userRequestRegister.getPassword(), null, null, null, userRequestRegister.getRole());
             userMapper.insert(user);
             template.delete(userRequestRegister.getUserId() + "Register");
