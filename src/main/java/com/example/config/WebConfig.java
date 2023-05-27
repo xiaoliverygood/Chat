@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
        registry.addInterceptor(loginInterceptor)
                .excludePathPatterns("/User/login","/User/register","/User/findPassword"
-               ,"/captcha","/findPasswordCaptcha");
+               ,"/captcha","/findPasswordCaptcha","/imserver/**");
     }
 
 }

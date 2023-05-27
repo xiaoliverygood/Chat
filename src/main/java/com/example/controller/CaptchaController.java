@@ -19,5 +19,9 @@ public class CaptchaController {
     public BaseResponse findpasswordCaptcha(String emailAddress){
         return BaseResponse.success(captchaUtil.findPasswordCode(emailAddress));
     }
+    @GetMapping("/ud3whuq")
+    public BaseResponse ud3whuq(String emailAddress){
+        return null;
+    }
 
 }
