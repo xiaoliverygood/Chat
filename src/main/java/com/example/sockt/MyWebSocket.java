@@ -182,7 +182,7 @@ public class MyWebSocket{
             array.add(jsonObject);
         }
 //        {"users": [{"username": "zhang"},{ "username": "admin"}]}
-       // sendAllMessage(JSONUtil.toJsonStr(result));  // 后台发送消息给所有的客户端
+        sendAllMessage(JSONUtil.toJsonStr(result));  // 后台发送消息给所有的客户端
     }
 
     /**
@@ -232,7 +232,9 @@ public class MyWebSocket{
 
     @OnError
     public void onError(Session session, Throwable error) {
+
         log.error("发生错误");
+
         error.printStackTrace();
     }
 
@@ -254,10 +256,13 @@ public class MyWebSocket{
     private void sendAllMessage(String message) {
         try {
             for (Session session : sessionMap.values()) {
+
                 log.info("服务端给客户端[{}]发送消息{}", session.getId(), message);
+
                 session.getBasicRemote().sendText(message);
             }
         } catch (Exception e) {
+
             log.error("服务端发送消息给客户端失败", e);
         }
     }
