@@ -7,6 +7,8 @@ import com.example.mapper.UserFriendMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
 * @author L
 * @description 针对表【user_friend】的数据库操作Service实现
@@ -19,8 +21,11 @@ public class UserFriendServiceImpl extends ServiceImpl<UserFriendMapper, UserFri
     UserFriendMapper userFriendMapper;
     @Override
     public Boolean addFriend(String myId, String friendId) {
-        UserFriend userFriend = new UserFriend(null,friendId,myId);
-        userFriendMapper.updateById(userFriend);
+//
+        UserFriend userFriend = new UserFriend(UUID.randomUUID().toString(),friendId,myId);
+
+        userFriendMapper.insert(userFriend);
+
         return true;
     }
 }

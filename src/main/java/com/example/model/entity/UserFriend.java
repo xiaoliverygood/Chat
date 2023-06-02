@@ -22,7 +22,7 @@ public class UserFriend implements Serializable {
     /**
      * 
      */
-    @TableId(type = IdType.AUTO)
+    @TableId
     private String id;
 
     /**

@@ -19,4 +19,18 @@ public interface UserService extends IService<User> {
     BaseResponse logout(HttpServletRequest httpServletRequest);
     BaseResponse addFriend(HttpServletRequest httpServletRequest,String friendId);
 
+    /**
+     * 查看我的好友（返回类型需要改变一下）
+     * @param httpServletRequest
+     * @return
+     */
+    //BaseResponse findOnlineUser(HttpServletRequest httpServletRequest);
+
+    /**
+     * 查找我的全部好友
+     * @param httpServletRequest
+     * @return
+     */
+    BaseResponse findMyfriend(HttpServletRequest httpServletRequest);
+
 }

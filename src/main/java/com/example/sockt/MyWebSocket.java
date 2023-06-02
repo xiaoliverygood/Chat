@@ -1,148 +1,21 @@
 package com.example.sockt;//package com.example.sockt;
-//
-//import com.example.model.entity.SocketMsg;
-//import com.fasterxml.jackson.databind.JsonMappingException;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.springframework.boot.json.JsonParseException;
-//import org.springframework.stereotype.Component;
-//
-//import javax.websocket.*;
-//import javax.websocket.server.PathParam;
-//import javax.websocket.server.ServerEndpoint;
-//import java.io.IOException;
-//import java.util.HashMap;
-//import java.util.Map;
-//import java.util.concurrent.CopyOnWriteArraySet;
-//
-///**
-// * @Auther: morou
-// * @Description: websocket的具体实现类
-// * 使用springboot的唯一区别是要@Component声明下，而使用独立容器是由容器自己管理websocket的，
-// * 但在springboot中连容器都是spring管理的。
-//    虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，
-//    所以可以用一个静态set保存起来。
-// */
-//
-//@ServerEndpoint(value = "/websocket/{nickname}")
-////类似于comtroller，但是一个是单通道的，这个websocket是双通道的这个是地址类似于@RequestMapper那样子
-//@Component//注册到IOC容器中
-//public class MyWebSocket {
-//    //用来存放每个客户端对应的MyWebSocket对象。
-//    private static CopyOnWriteArraySet<MyWebSocket> webSocketSet = new CopyOnWriteArraySet<MyWebSocket>();
-//    //与某个客户端的连接会话，需要通过它来给客户端发送数据
-//    private Session session;
-//    private String nickname;
-//    //用来记录sessionId和该session进行绑定
-//    private static Map<String,Session> map = new HashMap<String, Session>();
-//    /**
-//     * 连接建立成功调用的方法
-//     */
-//    @OnOpen
-//    public void onOpen(Session session,@PathParam("nickname") String nickname) {
-//        this.session = session;
-//        this.nickname=nickname;
-//
-//        map.put(session.getId(), session);
-//
-//        webSocketSet.add(this);     //加入set中
-//        System.out.println("有新连接加入:"+nickname+",当前在线人数为" + webSocketSet.size());
-//        this.session.getAsyncRemote().sendText("恭喜"+nickname+"成功连接上WebSocket(其频道号："+session.getId()+")-->当前在线人数为："+webSocketSet.size());
-//    }
-//    /**
-//     * 连接关闭调用的方法
-//     */
-//    @OnClose
-//    public void onClose() {
-//        webSocketSet.remove(this);  //从set中删除
-//        System.out.println("有一连接关闭！当前在线人数为" + webSocketSet.size());
-//    }
-//    /**
-//     * 收到客户端消息后调用的方法
-//     *
-//     * @param message 客户端发送过来的消息*/
-//    /**
-//     * 收到客户端消息后调用的方法
-//     *
-//     * @param message 客户端发送过来的消息*/
-//    @OnMessage
-//    public void onMessage(String message, Session session,@PathParam("nickname") String nickname) {
-//        System.out.println("来自客户端的消息-->"+nickname+": " + message);
-//
-//        //从客户端传过来的数据是json数据，所以这里使用jackson进行转换为SocketMsg对象，
-//        // 然后通过socketMsg的type进行判断是单聊还是群聊，进行相应的处理:
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        SocketMsg socketMsg;
-//
-//        try {
-//            socketMsg = objectMapper.readValue(message, SocketMsg.class);
-//            if(socketMsg.getType() == 1){
-//                //单聊.需要找到发送者和接受者.
-//
-//                socketMsg.setFromUser(session.getId());//发送者.
-//                Session fromSession = map.get(socketMsg.getFromUser());
-//                Session toSession = map.get(socketMsg.getToUser());
-//                //发送给接受者.
-//                if(toSession != null){
-//                    //发送给发送者.
-//                    fromSession.getAsyncRemote().sendText(nickname+"："+socketMsg.getMsg());
-//                    toSession.getAsyncRemote().sendText(nickname+"："+socketMsg.getMsg());
-//                }else{
-//                    //发送给发送者.
-//                    fromSession.getAsyncRemote().sendText("系统消息：对方不在线或者您输入的频道号不对");
-//                }
-//            }else{
-//                //群发消息
-//                broadcast(nickname+": "+socketMsg.getMsg());
-//            }
-//
-//        } catch (JsonParseException e) {
-//            e.printStackTrace();
-//        } catch (JsonMappingException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-////        //群发消息
-////        broadcast(nickname+": "+message);
-//    }
-//    /**
-//     * 发生错误时调用
-//     *
-//     */
-//    @OnError
-//    public void onError(Session session, Throwable error) {
-//        System.out.println("发生错误");
-//        error.printStackTrace();
-//    }
-//    /**
-//     * 群发自定义消息
-//     * */
-//    public  void broadcast(String message){
-//        for (MyWebSocket item : webSocketSet) {
-//            //同步异步说明参考：http://blog.csdn.net/who_is_xiaoming/article/details/53287691
-//            //this.session.getBasicRemote().sendText(message);
-//            item.session.getAsyncRemote().sendText(message);//异步发送消息.
-//        }
-//    }
-//}
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-
-//
-//import cn.hutool.json.JSONArray;
-//import cn.hutool.json.JSONObject;
-import com.example.model.entity.SocketMsg;
+import com.example.mapper.UserMapper;
+import com.example.model.respond.NoReadMessage;
+import com.example.utiliy.DateTranslation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -153,10 +26,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class MyWebSocket{
 
+    static UserMapper userMapper;
+
+    @Autowired
+    public void setUserMapper(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+
     private static final Logger log = LoggerFactory.getLogger(MyWebSocket.class);
 
     /**
      * 记录当前在线连接数
+     * userName是用户的名称
+     * Session是websocket的session
      */
     public static final Map<String, Session> sessionMap = new ConcurrentHashMap<>();
 
@@ -181,8 +63,37 @@ public class MyWebSocket{
             // {"username", "zhang", "username": "admin"}
             array.add(jsonObject);
         }
+        List<NoReadMessage> noReadMessages=userMapper.getNoReadMessages(userMapper.selectUserIdByName(username));
+
+        int i=1;
+
+        while(noReadMessages.size()>=i){
+
+            JSONObject jsonObject=new JSONObject();
+
+            LocalDateTime localDate = DateTranslation.dateTranslationLocalDateTime(noReadMessages.get(i - 1).getTime());
+
+            String text = noReadMessages.get(i - 1).getContent();
+
+            String fromId = userMapper.selectUserByUserId(noReadMessages.get(i - 1).getUserId());
+
+            jsonObject.set("from",fromId).set("time", localDate.toString()).set("text",text);
+
+            log.info("没读信息");
+
+            sendMessage(jsonObject.toString(),sessionMap.get(username));
+
+            i++;
+
+        }
+
+        userMapper.deleteFriendMessage(userMapper.selectUserIdByName(username));
+
 //        {"users": [{"username": "zhang"},{ "username": "admin"}]}
-        sendAllMessage(JSONUtil.toJsonStr(result));  // 后台发送消息给所有的客户端
+
+
+        //sendAllMessage(JSONUtil.toJsonStr(result));  // 后台发送消息给所有的客户端
+
     }
 
     /**
@@ -213,21 +124,54 @@ public class MyWebSocket{
 
         Session toSession = sessionMap.get(toUsername); // 根据 to用户名来获取 session，再通过session发送消息文本
 
-        if (toSession != null) {
+        boolean  isFridend=false;
+        int i=1;
+        List<String> myFriendslist=userMapper.findMyfriend(username);//得到的时用户的id
 
-            // 服务器端 再把消息组装一下，组装后的消息包含发送人和发送的文本内容
-            JSONObject jsonObject = new JSONObject();
+        while (myFriendslist.size()>=i){
+            //查看他是否我的好友
+            if(myFriendslist.get(i-1).equals(userMapper.selectUserIdByName(toUsername)))
+            {
+                isFridend=true;
+                break;
+            }
+            i++;
 
-            jsonObject.set("from", username);  // from 是 zhang
+        }
+
+        if(isFridend==true){//判断是否是我的好友再进行
+
+            if (toSession != null) {
+
+                // 服务器端 再把消息组装一下，组装后的消息包含发送人和发送的文本内容
+                JSONObject jsonObject = new JSONObject();
+
+                jsonObject.set("from", username);  // from 是 zhang
 
 //            jsonObject.set("text", socketMsg.getMsg());  // text 同上面的text
-            jsonObject.set("text", text);  // text 同上面的text
+                jsonObject.set("text", text);  // text 同上面的text
 
-            this.sendMessage(jsonObject.toString(), toSession);//将上面的json格式转化为string格式发送，tosession是指发送到指定的用户
+                this.sendMessage(jsonObject.toString(), toSession);//将上面的json格式转化为string格式发送，tosession是指发送到指定的用户
 
-        } else {
-            log.info("发送失败，未找到用户username={}的session", toUsername);
+            } else {
+
+                log.info("发送失败，该用户不在线", toUsername);
+
+                //将数据保存到数据库表
+
+                userMapper.insertFriendMessage(userMapper.selectUserIdByName(username),userMapper.selectUserIdByName(toUsername),text,new Date());
+
+            }
+
+        }else {
+            log.info("对方不是你的好友");//加入限制，需要好友才能发送信息
+
+            Session mySession = sessionMap.get(username);
+
+            this.sendMessage("对方不是你的好友",mySession);
         }
+
+
     }
 
     @OnError

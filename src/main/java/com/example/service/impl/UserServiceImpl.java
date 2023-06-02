@@ -10,6 +10,7 @@ import com.example.model.entity.User;
 import com.example.model.request.UserRequestFindPassword;
 import com.example.model.request.UserRequestLogin;
 import com.example.model.request.UserRequestRegister;
+import com.example.model.respond.FriendUser;
 import com.example.model.respond.UserRespondLogin;
 import com.example.service.UserFriendService;
 import com.example.service.UserService;
@@ -19,6 +20,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -43,7 +45,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             template.delete(userRequestRegister.getUserId() + "Register");
             return BaseResponse.success(user);
         } else {
-            return BaseResponse.Error(ResponMessge.CaptchaError.getMessage());
+            return BaseResponse.Error(ResponMessge.CaptchaError.getMessage()+"验证码错误！");
         }
     }
 
@@ -100,6 +102,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public BaseResponse addFriend(HttpServletRequest httpServletRequest, String friendId) {
         return BaseResponse.success(userFriendService.addFriend(template.opsForValue().get(httpServletRequest.getHeader("token")),friendId));
+    }
+
+    @Override
+    public BaseResponse findMyfriend(HttpServletRequest httpServletRequest) {
+        User user = userMapper.selectById(template.opsForValue().get(httpServletRequest.getHeader("token")));
+
+        List<FriendUser> myfriendsAllMessage = userMapper.findMyfriendsAllMessage(user.getUserId());
+
+        return BaseResponse.success(myfriendsAllMessage);
     }
 }
 
